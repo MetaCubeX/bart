@@ -1,7 +1,7 @@
 package bart
 
 import (
-	"math/rand/v2"
+	"math/rand"
 	"net/netip"
 	"testing"
 )
@@ -104,7 +104,7 @@ func TestLiteContains(t *testing.T) {
 		tb.Insert(route.pfx, nil)
 	}
 
-	for range 10_000 {
+	for j := 0; j < 10_000; j++ {
 		ip := randomAddr()
 
 		got1 := lt.Contains(ip)
@@ -150,7 +150,7 @@ func TestLiteDeleteShuffled(t *testing.T) {
 		rt1.Delete(pfx.pfx)
 	}
 
-	for range 10 {
+	for j := 0; j < 10; j++ {
 		pfxs2 := append([]goldTableItem[int](nil), pfxs...)
 		toDelete2 := append([]goldTableItem[int](nil), toDelete...)
 		rand.Shuffle(len(toDelete2), func(i, j int) { toDelete2[i], toDelete2[j] = toDelete2[j], toDelete2[i] })

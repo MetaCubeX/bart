@@ -1,7 +1,7 @@
 package lpm
 
 import (
-	"slices"
+	"reflect"
 	"testing"
 )
 
@@ -58,7 +58,7 @@ func TestBackTrackingBitset(t *testing.T) {
 
 	for _, tc := range tests {
 		got := BackTrackingBitset(tc.idx).All()
-		if !slices.Equal(got, tc.want) {
+		if !reflect.DeepEqual(got, tc.want) {
 			t.Errorf("BackTrackingBitset(%d), want: %v, got: %v", tc.idx, tc.want, got)
 		}
 	}

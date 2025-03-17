@@ -1,7 +1,7 @@
 package allot
 
 import (
-	"slices"
+	"reflect"
 	"testing"
 )
 
@@ -42,7 +42,7 @@ func TestIdxToHostRoutes(t *testing.T) {
 
 	for _, tc := range tests {
 		got := IdxToHostRoutes(tc.idx).All()
-		if !slices.Equal(got, tc.want) {
+		if !reflect.DeepEqual(got, tc.want) {
 			t.Errorf("IdxToHostRoutes(%d), want: %v, got: %v", tc.idx, tc.want, got)
 		}
 	}
@@ -89,7 +89,7 @@ func TestIdxToPrefixRoutes(t *testing.T) {
 
 	for _, tc := range tests {
 		got := IdxToPrefixRoutes(tc.idx).All()
-		if !slices.Equal(got, tc.want) {
+		if !reflect.DeepEqual(got, tc.want) {
 			t.Errorf("IdxToPrefixRoutes(%d), want: %v, got: %v", tc.idx, tc.want, got)
 		}
 	}

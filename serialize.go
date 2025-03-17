@@ -5,12 +5,11 @@ package bart
 
 import (
 	"bytes"
-	"cmp"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/netip"
-	"slices"
+	"sort"
 	"strings"
 
 	"github.com/gaissmai/bart/internal/art"
@@ -123,8 +122,8 @@ func (n *node[V]) fprintRec(w io.Writer, parent trieItem[V], pad string) error {
 	directItems := n.directItemsRec(parent.idx, parent.path, parent.depth, parent.is4)
 
 	// sort them by netip.Prefix, not by baseIndex
-	slices.SortFunc(directItems, func(a, b trieItem[V]) int {
-		return cmpPrefix(a.cidr, b.cidr)
+	sort.Slice(directItems, func(i, j int) bool {
+		return lessPrefix(directItems[i].cidr, directItems[j].cidr)
 	})
 
 	// symbols used in tree
@@ -216,8 +215,8 @@ func (n *node[V]) dumpListRec(parentIdx uint, path stridePath, depth int, is4 bo
 	directItems := n.directItemsRec(parentIdx, path, depth, is4)
 
 	// sort the items by prefix
-	slices.SortFunc(directItems, func(a, b trieItem[V]) int {
-		return cmpPrefix(a.cidr, b.cidr)
+	sort.Slice(directItems, func(i, j int) bool {
+		return lessPrefix(directItems[i].cidr, directItems[j].cidr)
 	})
 
 	nodes := make([]DumpListNode[V], 0, len(directItems))
@@ -316,12 +315,17 @@ func (n *node[V]) directItemsRec(parentIdx uint, path stridePath, depth int, is4
 	return directItems
 }
 
-// cmpPrefix, helper function, compare func for prefix sort,
+// lessPrefix, helper function, compare func for prefix sort,
 // all cidrs are already normalized
-func cmpPrefix(a, b netip.Prefix) int {
-	if cmp := a.Addr().Compare(b.Addr()); cmp != 0 {
-		return cmp
+func lessPrefix(a, b netip.Prefix) bool {
+	switch a.Addr().Compare(b.Addr()) {
+	case -1:
+		return true
+	case 1:
+		return false
 	}
-
-	return cmp.Compare(a.Bits(), b.Bits())
+	if a.Bits() < b.Bits() {
+		return true
+	}
+	return false
 }

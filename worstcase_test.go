@@ -432,7 +432,7 @@ func BenchmarkWorstCaseMatch4(b *testing.B) {
 		}
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Contains(worstCaseProbeIP4)
 		}
 	})
@@ -444,7 +444,7 @@ func BenchmarkWorstCaseMatch4(b *testing.B) {
 		}
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Contains(worstCaseProbeIP4)
 		}
 	})
@@ -456,7 +456,7 @@ func BenchmarkWorstCaseMatch4(b *testing.B) {
 		}
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Lookup(worstCaseProbeIP4)
 		}
 	})
@@ -468,7 +468,7 @@ func BenchmarkWorstCaseMatch4(b *testing.B) {
 		}
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.LookupPrefix(worstCaseProbePfx4)
 		}
 	})
@@ -480,7 +480,7 @@ func BenchmarkWorstCaseMatch4(b *testing.B) {
 		}
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.LookupPrefixLPM(worstCaseProbePfx4)
 		}
 	})
@@ -496,7 +496,7 @@ func BenchmarkWorstCaseMiss4(b *testing.B) {
 		tbl.Delete(mpp("255.255.255.255/32")) // delete matching prefix
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Contains(worstCaseProbeIP4)
 		}
 	})
@@ -510,7 +510,7 @@ func BenchmarkWorstCaseMiss4(b *testing.B) {
 		tbl.Delete(mpp("255.255.255.255/32")) // delete matching prefix
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Contains(worstCaseProbeIP4)
 		}
 	})
@@ -524,7 +524,7 @@ func BenchmarkWorstCaseMiss4(b *testing.B) {
 		tbl.Delete(mpp("255.255.255.255/32")) // delete matching prefix
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Lookup(worstCaseProbeIP4)
 		}
 	})
@@ -538,7 +538,7 @@ func BenchmarkWorstCaseMiss4(b *testing.B) {
 		tbl.Delete(mpp("255.255.255.255/32")) // delete matching prefix
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.LookupPrefix(worstCaseProbePfx4)
 		}
 	})
@@ -552,7 +552,7 @@ func BenchmarkWorstCaseMiss4(b *testing.B) {
 		tbl.Delete(mpp("255.255.255.255/32")) // delete matching prefix
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.LookupPrefixLPM(worstCaseProbePfx4)
 		}
 	})
@@ -566,7 +566,7 @@ func BenchmarkWorstCaseMatch6(b *testing.B) {
 		}
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Contains(worstCaseProbeIP6)
 		}
 	})
@@ -578,7 +578,7 @@ func BenchmarkWorstCaseMatch6(b *testing.B) {
 		}
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Contains(worstCaseProbeIP6)
 		}
 	})
@@ -590,7 +590,7 @@ func BenchmarkWorstCaseMatch6(b *testing.B) {
 		}
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Lookup(worstCaseProbeIP6)
 		}
 	})
@@ -602,7 +602,7 @@ func BenchmarkWorstCaseMatch6(b *testing.B) {
 		}
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.LookupPrefix(worstCaseProbePfx6)
 		}
 	})
@@ -614,7 +614,7 @@ func BenchmarkWorstCaseMatch6(b *testing.B) {
 		}
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.LookupPrefixLPM(worstCaseProbePfx6)
 		}
 	})
@@ -630,7 +630,7 @@ func BenchmarkWorstCaseMiss6(b *testing.B) {
 		tbl.Delete(mpp("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128")) // delete matching prefix
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Contains(worstCaseProbeIP6)
 		}
 	})
@@ -644,7 +644,7 @@ func BenchmarkWorstCaseMiss6(b *testing.B) {
 		tbl.Delete(mpp("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128")) // delete matching prefix
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Contains(worstCaseProbeIP6)
 		}
 	})
@@ -658,7 +658,7 @@ func BenchmarkWorstCaseMiss6(b *testing.B) {
 		tbl.Delete(mpp("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128")) // delete matching prefix
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.Lookup(worstCaseProbeIP6)
 		}
 	})
@@ -672,7 +672,7 @@ func BenchmarkWorstCaseMiss6(b *testing.B) {
 		tbl.Delete(mpp("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128")) // delete matching prefix
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.LookupPrefix(worstCaseProbePfx6)
 		}
 	})
@@ -686,7 +686,7 @@ func BenchmarkWorstCaseMiss6(b *testing.B) {
 		tbl.Delete(mpp("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128")) // delete matching prefix
 
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			tbl.LookupPrefixLPM(worstCaseProbePfx6)
 		}
 	})
