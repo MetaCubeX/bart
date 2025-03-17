@@ -14,7 +14,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/gaissmai/bart/internal/art"
+	"github.com/metacubex/bart/internal/art"
 )
 
 func TestInverseIndex(t *testing.T) {

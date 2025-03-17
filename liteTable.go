@@ -6,7 +6,7 @@ package bart
 import (
 	"net/netip"
 
-	"github.com/gaissmai/bart/internal/art"
+	"github.com/metacubex/bart/internal/art"
 )
 
 // Lite is the little sister of [Table]. Lite is ideal for simple

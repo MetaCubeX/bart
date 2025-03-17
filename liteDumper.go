@@ -8,7 +8,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/gaissmai/bart/internal/art"
+	"github.com/metacubex/bart/internal/art"
 )
 
 // ##################################################

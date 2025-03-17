@@ -6,10 +6,10 @@ package bart
 import (
 	"net/netip"
 
-	"github.com/gaissmai/bart/internal/art"
-	"github.com/gaissmai/bart/internal/bitset"
-	"github.com/gaissmai/bart/internal/lpm"
-	"github.com/gaissmai/bart/internal/sparse"
+	"github.com/metacubex/bart/internal/art"
+	"github.com/metacubex/bart/internal/bitset"
+	"github.com/metacubex/bart/internal/lpm"
+	"github.com/metacubex/bart/internal/sparse"
 )
 
 // liteNode, for description see similar node struct, but here without payload V.
