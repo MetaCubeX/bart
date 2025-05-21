@@ -1,3 +1,5 @@
+//go:build go1.23
+
 // Copyright (c) 2024 Karl Gaissmaier
 // SPDX-License-Identifier: MIT
 
@@ -7,6 +9,7 @@ import (
 	"fmt"
 	"net/netip"
 	"slices"
+	"sort"
 	"testing"
 )
 
@@ -509,8 +512,8 @@ func (t *goldTable[V]) lookupPrefixReverse(pfx netip.Prefix) []netip.Prefix {
 	}
 
 	// b,a reverse sort order!
-	slices.SortFunc(result, func(a, b netip.Prefix) int {
-		return cmpPrefix(b, a)
+	sort.Slice(result, func(i, j int) bool {
+		return lessPrefix(result[j], result[i])
 	})
 	return result
 }
@@ -526,7 +529,7 @@ func BenchmarkSubnets(b *testing.B) {
 	probe := mpp("42.150.112.0/20")
 	b.Run(fmt.Sprintf("Subnets(%q) from %d random pfxs", probe, n), func(b *testing.B) {
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			for range rtbl.Subnets(probe) {
 				continue
 			}
@@ -545,7 +548,7 @@ func BenchmarkSupernets(b *testing.B) {
 	probe := mpp("42.150.112.0/20")
 	b.Run(fmt.Sprintf("Supernets(%q) from %d random pfxs", probe, n), func(b *testing.B) {
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			for range rtbl.Supernets(probe) {
 				continue
 			}

@@ -362,7 +362,7 @@ func TestLiteContainsCompare(t *testing.T) {
 		fast.Insert(pfx.pfx)
 	}
 
-	for range 10_000 {
+	for j := 0; j < 10_000; j++ {
 		a := randomAddr()
 
 		_, goldOK := gold.lookup(a)
@@ -443,7 +443,7 @@ func TestLiteLookupPrefixCompare(t *testing.T) {
 		fast.Insert(pfx.pfx)
 	}
 
-	for range 10_000 {
+	for j := 0; j < 10_000; j++ {
 		pfx := randomPrefix()
 
 		_, goldOK := gold.lookupPfx(pfx)
@@ -469,7 +469,7 @@ func TestLiteLookupPrefixLPMCompare(t *testing.T) {
 		fast.Insert(pfx.pfx)
 	}
 
-	for range 10_000 {
+	for j := 0; j < 10_000; j++ {
 		pfx := randomPrefix()
 
 		goldLPM, _, goldOK := gold.lookupPfxLPM(pfx)
@@ -490,12 +490,12 @@ func TestLiteInsertPersistShuffled(t *testing.T) {
 
 	pfxs := randomPrefixes(1000)
 
-	for range 10 {
+	for j := 0; j < 10; j++ {
 		pfxs2 := append([]goldTableItem[int](nil), pfxs...)
 		rand.Shuffle(len(pfxs2), func(i, j int) { pfxs2[i], pfxs2[j] = pfxs2[j], pfxs2[i] })
 
 		addrs := make([]netip.Addr, 0, 10_000)
-		for range 10_000 {
+		for j := 0; j < 10_000; j++ {
 			addrs = append(addrs, randomAddr())
 		}
 
@@ -568,7 +568,7 @@ func TestLiteDeleteCompare(t *testing.T) {
 		fast.Delete(pfx.pfx)
 	}
 
-	for range numProbes {
+	for j := 0; j < numProbes; j++ {
 		a := randomAddr()
 
 		_, goldOK := gold.lookup(a)
@@ -614,7 +614,7 @@ func TestLiteDeleteShuffled(t *testing.T) {
 		rt1.Delete(pfx.pfx)
 	}
 
-	for range 10 {
+	for j := 0; j < 10; j++ {
 		pfxs2 := append([]goldTableItem[int](nil), pfxs...)
 		toDelete2 := append([]goldTableItem[int](nil), toDelete...)
 		rand.Shuffle(len(toDelete2), func(i, j int) { toDelete2[i], toDelete2[j] = toDelete2[j], toDelete2[i] })
@@ -694,7 +694,7 @@ func TestLiteClone(t *testing.T) {
 func TestLiteUnion(t *testing.T) {
 	t.Parallel()
 
-	for range 10 {
+	for j := 0; j < 10; j++ {
 		t.Run("Union", func(t *testing.T) {
 			t.Parallel()
 			pfx1 := randomRealWorldPrefixes(1_000)

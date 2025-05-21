@@ -26,7 +26,6 @@
 package bart
 
 import (
-	"iter"
 	"net/netip"
 	"sync"
 
@@ -643,7 +642,7 @@ LOOP:
 
 // Supernets returns an iterator over all CIDRs covering pfx.
 // The iteration is in reverse CIDR sort order, from longest-prefix-match to shortest-prefix-match.
-func (t *Table[V]) Supernets(pfx netip.Prefix) iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) Supernets(pfx netip.Prefix) func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		if !pfx.IsValid() {
 			return
@@ -753,7 +752,7 @@ func (t *Table[V]) Supernets(pfx netip.Prefix) iter.Seq2[netip.Prefix, V] {
 
 // Subnets returns an iterator over all CIDRs covered by pfx.
 // The iteration is in natural CIDR sort order.
-func (t *Table[V]) Subnets(pfx netip.Prefix) iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) Subnets(pfx netip.Prefix) func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		if !pfx.IsValid() {
 			return
@@ -911,28 +910,28 @@ func (t *Table[V]) Size6() int {
 // All returns an iterator over key-value pairs from Table. The iteration order
 // is not specified and is not guaranteed to be the same from one call to the
 // next.
-func (t *Table[V]) All() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) All() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root4.allRec(stridePath{}, 0, true, yield) && t.root6.allRec(stridePath{}, 0, false, yield)
 	}
 }
 
 // All4 is like [Table.All] but only for the v4 routing table.
-func (t *Table[V]) All4() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) All4() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root4.allRec(stridePath{}, 0, true, yield)
 	}
 }
 
 // All6 is like [Table.All] but only for the v6 routing table.
-func (t *Table[V]) All6() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) All6() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root6.allRec(stridePath{}, 0, false, yield)
 	}
 }
 
 // AllSorted returns an iterator over key-value pairs from Table2 in natural CIDR sort order.
-func (t *Table[V]) AllSorted() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) AllSorted() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root4.allRecSorted(stridePath{}, 0, true, yield) &&
 			t.root6.allRecSorted(stridePath{}, 0, false, yield)
@@ -940,14 +939,14 @@ func (t *Table[V]) AllSorted() iter.Seq2[netip.Prefix, V] {
 }
 
 // AllSorted4 is like [Table.AllSorted] but only for the v4 routing table.
-func (t *Table[V]) AllSorted4() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) AllSorted4() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root4.allRecSorted(stridePath{}, 0, true, yield)
 	}
 }
 
 // AllSorted6 is like [Table.AllSorted] but only for the v6 routing table.
-func (t *Table[V]) AllSorted6() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) AllSorted6() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root6.allRecSorted(stridePath{}, 0, false, yield)
 	}

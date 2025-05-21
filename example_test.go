@@ -131,9 +131,10 @@ func ExampleTable_AllSorted4_rangeoverfunc() {
 		rtbl.Insert(item.cidr, item.nextHop)
 	}
 
-	for pfx, val := range rtbl.AllSorted4() {
+	rtbl.AllSorted4()(func(pfx netip.Prefix, val netip.Addr) bool {
 		fmt.Printf("%v\t%v\n", pfx, val)
-	}
+		return true
+	})
 
 	// Output:
 	// 10.0.0.0/8	9.9.9.9
@@ -155,9 +156,10 @@ func ExampleTable_Subnets_rangeoverfunc() {
 
 	cidr := netip.MustParsePrefix("0.0.0.0/1")
 
-	for pfx := range rtbl.Subnets(cidr) {
+	rtbl.Subnets(cidr)(func(pfx netip.Prefix, _ netip.Addr) bool {
 		fmt.Printf("%v\n", pfx)
-	}
+		return true
+	})
 
 	// Output:
 	// 10.0.0.0/8
@@ -176,13 +178,14 @@ func ExampleTable_Supernets_rangeoverfunc() {
 	cidr := netip.MustParsePrefix("2001:db8::/32")
 
 	counter := 0
-	for pfx := range rtbl.Supernets(cidr) {
+	rtbl.Supernets(cidr)(func(pfx netip.Prefix, _ netip.Addr) bool {
 		fmt.Printf("%v\n", pfx)
 		counter++
 		if counter >= 2 {
-			break
+			return false
 		}
-	}
+		return true
+	})
 
 	// Output:
 	// 2001:db8::/32

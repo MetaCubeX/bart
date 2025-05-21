@@ -5,7 +5,7 @@ package bart
 
 import (
 	"net/netip"
-	"slices"
+	"sort"
 
 	"github.com/gaissmai/bart/internal/art"
 	"github.com/gaissmai/bart/internal/lpm"
@@ -509,7 +509,9 @@ func (n *node[V]) allRecSorted(path stridePath, depth int, is4 bool, yield func(
 	allIndices := n.prefixes.AsSlice(&[256]uint8{})
 
 	// sort indices in CIDR sort order
-	slices.SortFunc(allIndices, cmpIndexRank)
+	sort.Slice(allIndices, func(i, j int) bool {
+		return lessIndexRank(allIndices[i], allIndices[j])
+	})
 
 	childCursor := 0
 
@@ -823,7 +825,9 @@ func (n *node[V]) eachSubnet(octets []byte, depth int, is4 bool, pfxIdx uint8, y
 	}
 
 	// sort indices in CIDR sort order
-	slices.SortFunc(allCoveredIndices, cmpIndexRank)
+	sort.Slice(allCoveredIndices, func(i, j int) bool {
+		return lessIndexRank(allCoveredIndices[i], allCoveredIndices[j])
+	})
 
 	// 2. collect all covered child addrs by prefix
 
@@ -914,26 +918,26 @@ func (n *node[V]) eachSubnet(octets []byte, depth int, is4 bool, pfxIdx uint8, y
 	return true
 }
 
-// cmpIndexRank, sort indexes in prefix sort order.
-func cmpIndexRank(aIdx, bIdx uint8) int {
+// lessIndexRank, sort indexes in prefix sort order.
+func lessIndexRank(aIdx, bIdx uint8) bool {
 	// convert idx [1..255] to prefix
 	aOctet, aBits := art.IdxToPfx256(aIdx)
 	bOctet, bBits := art.IdxToPfx256(bIdx)
 
 	// cmp the prefixes, first by address and then by bits
 	if aOctet == bOctet {
-		if aBits <= bBits {
-			return -1
+		if aBits < bBits {
+			return true
 		}
 
-		return 1
+		return false
 	}
 
 	if aOctet < bOctet {
-		return -1
+		return true
 	}
 
-	return 1
+	return false
 }
 
 // cidrFromPath, helper function,
@@ -946,7 +950,9 @@ func cidrFromPath(path stridePath, depth int, is4 bool, idx uint8) netip.Prefix 
 	path[depth] = octet
 
 	// zero/mask the bytes after prefix bits
-	clear(path[depth+1:])
+	for i := range path[depth+1:] {
+		path[depth+1+i] = 0
+	}
 
 	// make ip addr from octets
 	var ip netip.Addr

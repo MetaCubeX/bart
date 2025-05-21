@@ -4,7 +4,7 @@
 package sparse
 
 import (
-	"math/rand/v2"
+	"math/rand"
 	"testing"
 )
 
@@ -21,7 +21,7 @@ func TestSparseArrayCount(t *testing.T) {
 	t.Parallel()
 	a := new(Array256[int])
 
-	for i := range 255 {
+	for i := 0; i < 255; i++ {
 		a.InsertAt(uint8(i), i)
 		a.InsertAt(uint8(i), i)
 	}
@@ -29,7 +29,7 @@ func TestSparseArrayCount(t *testing.T) {
 		t.Errorf("Count, expected 255, got %d", c)
 	}
 
-	for i := range 128 {
+	for i := 0; i < 128; i++ {
 		a.DeleteAt(uint8(i))
 		a.DeleteAt(uint8(i))
 	}
@@ -42,12 +42,12 @@ func TestSparseArrayGet(t *testing.T) {
 	t.Parallel()
 	a := new(Array256[int])
 
-	for i := range 255 {
+	for i := 0; i < 255; i++ {
 		a.InsertAt(uint8(i), i)
 	}
 
-	for range 100 {
-		i := rand.IntN(100)
+	for j := 0; j < 100; j++ {
+		i := rand.Intn(100)
 		v, ok := a.Get(uint8(i))
 		if !ok {
 			t.Errorf("Get, expected true, got %v", ok)
@@ -114,7 +114,7 @@ func TestSparseArrayUpdate(t *testing.T) {
 	t.Parallel()
 	a := new(Array256[int])
 
-	for i := range 100 {
+	for i := 0; i < 100; i++ {
 		a.InsertAt(uint8(i), i)
 	}
 
@@ -129,7 +129,7 @@ func TestSparseArrayUpdate(t *testing.T) {
 		})
 	}
 
-	for i := range 100 {
+	for i := 0; i < 100; i++ {
 		v, _ := a.Get(uint8(i))
 		if v != 2*i {
 			t.Errorf("UpdateAt, expected %d, got %d", 2*i, v)
@@ -154,7 +154,7 @@ func TestSparseArrayCopy(t *testing.T) {
 
 	a = new(Array256[int])
 
-	for i := range 255 {
+	for i := 0; i < 255; i++ {
 		a.InsertAt(uint8(i), i)
 	}
 
@@ -169,7 +169,7 @@ func TestSparseArrayCopy(t *testing.T) {
 	}
 
 	// update array a
-	for i := range 255 {
+	for i := 0; i < 255; i++ {
 		a.UpdateAt(uint8(i), func(u int, _ bool) int { return u + 1 })
 	}
 

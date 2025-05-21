@@ -68,7 +68,7 @@ func TestOverlapsCompare(t *testing.T) {
 	const numEntries = 6
 
 	seen := map[bool]int{}
-	for range 10_000 {
+	for j := 0; j < 10_000; j++ {
 		pfxs := randomPrefixes(numEntries)
 		fast := new(Table[int])
 		gold := new(goldTable[int]).insertMany(pfxs)

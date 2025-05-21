@@ -21,8 +21,8 @@ var uint8SliceSink []uint8
 
 func TestInverseIndex(t *testing.T) {
 	t.Parallel()
-	for i := range maxItems {
-		for bits := range uint8(8) {
+	for i := 0; i < maxItems; i++ {
+		for bits := uint8(0); bits < uint8(8); bits++ {
 			octet := byte(i & (0xFF << (strideLen - bits)))
 			idx := art.PfxToIdx256(octet, bits)
 			octet2, len2 := art.IdxToPfx256(idx)
@@ -48,7 +48,7 @@ func TestPrefixInsert(t *testing.T) {
 		fast.prefixes.InsertAt(art.PfxToIdx256(pfx.octet, pfx.bits), pfx.val)
 	}
 
-	for i := range 256 {
+	for i := 0; i < 256; i++ {
 		octet := byte(i)
 		addr := uint8(i)
 		goldVal, goldOK := gold.lpm(octet)
@@ -81,7 +81,7 @@ func TestPrefixDelete(t *testing.T) {
 		t.Fatalf("goldenStride has %d entries after deletes, want 50", cnt)
 	}
 
-	for i := range 256 {
+	for i := 0; i < 256; i++ {
 		octet := byte(i)
 		addr := uint8(i)
 		goldVal, goldOK := gold.lpm(octet)
@@ -118,7 +118,7 @@ func TestOverlapsRoutes(t *testing.T) {
 	const numEntries = 2
 	all := allStridePfxs()
 
-	for range 100_000 {
+	for j := 0; j < 100_000; j++ {
 		shuffleStridePfxs(all)
 		pfxs := all[:numEntries]
 
@@ -168,7 +168,7 @@ func BenchmarkNodePrefixInsert(b *testing.B) {
 			idx := art.PfxToIdx256(route.octet, route.bits)
 
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				boolSink = this.prefixes.InsertAt(idx, 0)
 			}
 		})
@@ -193,7 +193,7 @@ func BenchmarkNodePrefixUpdate(b *testing.B) {
 			idx := art.PfxToIdx256(route.octet, route.bits)
 
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				_, boolSink = this.prefixes.UpdateAt(idx, func(int, bool) int { return 1 })
 			}
 		})
@@ -218,7 +218,7 @@ func BenchmarkNodePrefixDelete(b *testing.B) {
 			idx := art.PfxToIdx256(route.octet, route.bits)
 
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				_, boolSink = this.prefixes.DeleteAt(idx)
 			}
 		})
@@ -243,7 +243,7 @@ func BenchmarkNodePrefixLPM(b *testing.B) {
 			idx := art.PfxToIdx256(route.octet, route.bits)
 
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				_, _, boolSink = this.lpmGet(uint(idx))
 			}
 		})
@@ -253,7 +253,7 @@ func BenchmarkNodePrefixLPM(b *testing.B) {
 			idx := art.PfxToIdx256(route.octet, route.bits)
 
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				boolSink = this.lpmTest(uint(idx))
 			}
 		})
@@ -264,7 +264,7 @@ func BenchmarkNodePrefixesAsSlice(b *testing.B) {
 	for _, nPrefixes := range prefixCount {
 		this := new(node[any])
 
-		for range nPrefixes {
+		for j := 0; j < nPrefixes; j++ {
 			idx := byte(rand.Intn(maxItems))
 			this.prefixes.InsertAt(idx, nil)
 		}
@@ -272,7 +272,7 @@ func BenchmarkNodePrefixesAsSlice(b *testing.B) {
 		b.Run(fmt.Sprintf("Set %d", nPrefixes), func(b *testing.B) {
 			var buf [256]uint8
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				uint8SliceSink = this.prefixes.AsSlice(&buf)
 			}
 		})
@@ -283,14 +283,14 @@ func BenchmarkNodePrefixesAll(b *testing.B) {
 	for _, nPrefixes := range prefixCount {
 		this := new(node[any])
 
-		for range nPrefixes {
+		for j := 0; j < nPrefixes; j++ {
 			idx := byte(rand.Intn(maxItems))
 			boolSink = this.prefixes.InsertAt(idx, nil)
 		}
 
 		b.Run(fmt.Sprintf("Set %d", nPrefixes), func(b *testing.B) {
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				uint8SliceSink = this.prefixes.All()
 			}
 		})
@@ -322,7 +322,7 @@ func BenchmarkNodePrefixIntersectionCardinality(b *testing.B) {
 
 		b.Run(fmt.Sprintf("With %d", nroutes), func(b *testing.B) {
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				intSink = this.prefixes.IntersectionCardinality(&other.prefixes.BitSet256)
 			}
 		})
@@ -333,7 +333,7 @@ func BenchmarkNodeChildInsert(b *testing.B) {
 	for _, nchilds := range childCount {
 		this := new(node[int])
 
-		for range nchilds {
+		for j := 0; j < nchilds; j++ {
 			octet := rand.Intn(maxItems)
 			this.children.InsertAt(uint8(octet), nil)
 		}
@@ -342,7 +342,7 @@ func BenchmarkNodeChildInsert(b *testing.B) {
 			octet := rand.Intn(maxItems)
 
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				boolSink = this.children.InsertAt(uint8(octet), nil)
 			}
 		})
@@ -353,7 +353,7 @@ func BenchmarkNodeChildDelete(b *testing.B) {
 	for _, nchilds := range childCount {
 		this := new(node[int])
 
-		for range nchilds {
+		for j := 0; j < nchilds; j++ {
 			octet := rand.Intn(maxItems)
 			this.children.InsertAt(uint8(octet), nil)
 		}
@@ -362,7 +362,7 @@ func BenchmarkNodeChildDelete(b *testing.B) {
 			octet := rand.Intn(maxItems)
 
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				_, boolSink = this.children.DeleteAt(uint8(octet))
 			}
 		})
@@ -373,7 +373,7 @@ func BenchmarkNodeChildrenAsSlice(b *testing.B) {
 	for _, nchilds := range childCount {
 		this := new(node[int])
 
-		for range nchilds {
+		for j := 0; j < nchilds; j++ {
 			octet := byte(rand.Intn(maxItems))
 			this.children.InsertAt(octet, nil)
 		}
@@ -381,7 +381,7 @@ func BenchmarkNodeChildrenAsSlice(b *testing.B) {
 		b.Run(fmt.Sprintf("Set %d", nchilds), func(b *testing.B) {
 			var buf [256]uint8
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				uint8SliceSink = this.children.AsSlice(&buf)
 			}
 		})
@@ -392,14 +392,14 @@ func BenchmarkNodeChildrenAll(b *testing.B) {
 	for _, nchilds := range childCount {
 		this := new(node[int])
 
-		for range nchilds {
+		for j := 0; j < nchilds; j++ {
 			octet := byte(rand.Intn(maxItems))
 			this.children.InsertAt(octet, nil)
 		}
 
 		b.Run(fmt.Sprintf("Set %d", nchilds), func(b *testing.B) {
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				uint8SliceSink = this.children.All()
 			}
 		})
@@ -411,7 +411,7 @@ func BenchmarkNodeChildIntersectionCardinality(b *testing.B) {
 		this := new(node[int])
 		other := new(node[int])
 
-		for range nchilds {
+		for j := 0; j < nchilds; j++ {
 			octet := byte(rand.Intn(maxItems))
 			this.children.InsertAt(octet, nil)
 
@@ -421,7 +421,7 @@ func BenchmarkNodeChildIntersectionCardinality(b *testing.B) {
 
 		b.Run(fmt.Sprintf("With %d", nchilds), func(b *testing.B) {
 			b.ResetTimer()
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				intSink = this.children.IntersectionCardinality(&other.children.BitSet256)
 			}
 		})

@@ -1266,7 +1266,7 @@ func TestContainsCompare(t *testing.T) {
 		fast.Insert(pfx.pfx, pfx.val)
 	}
 
-	for range 10_000 {
+	for j := 0; j < 10_000; j++ {
 		a := randomAddr()
 
 		_, goldOK := gold.lookup(a)
@@ -1294,7 +1294,7 @@ func TestLookupCompare(t *testing.T) {
 	seenVals4 := map[int]bool{}
 	seenVals6 := map[int]bool{}
 
-	for range 10_000 {
+	for j := 0; j < 10_000; j++ {
 		a := randomAddr()
 
 		goldVal, goldOK := gold.lookup(a)
@@ -1395,7 +1395,7 @@ func TestLookupPrefixCompare(t *testing.T) {
 	seenVals4 := map[int]bool{}
 	seenVals6 := map[int]bool{}
 
-	for range 10_000 {
+	for j := 0; j < 10_000; j++ {
 		pfx := randomPrefix()
 
 		goldVal, goldOK := gold.lookupPfx(pfx)
@@ -1440,7 +1440,7 @@ func TestLookupPrefixLPMCompare(t *testing.T) {
 	seenVals4 := map[int]bool{}
 	seenVals6 := map[int]bool{}
 
-	for range 10_000 {
+	for j := 0; j < 10_000; j++ {
 		pfx := randomPrefix()
 
 		goldLPM, goldVal, goldOK := gold.lookupPfxLPM(pfx)
@@ -1481,12 +1481,12 @@ func TestInsertShuffled(t *testing.T) {
 
 	pfxs := randomPrefixes(1000)
 
-	for range 10 {
+	for j := 0; j < 10; j++ {
 		pfxs2 := append([]goldTableItem[int](nil), pfxs...)
 		rand.Shuffle(len(pfxs2), func(i, j int) { pfxs2[i], pfxs2[j] = pfxs2[j], pfxs2[i] })
 
 		addrs := make([]netip.Addr, 0, 10_000)
-		for range 10_000 {
+		for j := 0; j < 10_000; j++ {
 			addrs = append(addrs, randomAddr())
 		}
 
@@ -1519,12 +1519,12 @@ func TestInsertPersistShuffled(t *testing.T) {
 
 	pfxs := randomPrefixes(1000)
 
-	for range 10 {
+	for j := 0; j < 10; j++ {
 		pfxs2 := append([]goldTableItem[int](nil), pfxs...)
 		rand.Shuffle(len(pfxs2), func(i, j int) { pfxs2[i], pfxs2[j] = pfxs2[j], pfxs2[i] })
 
 		addrs := make([]netip.Addr, 0, 10_000)
-		for range 10_000 {
+		for j := 0; j < 10_000; j++ {
 			addrs = append(addrs, randomAddr())
 		}
 
@@ -1600,7 +1600,7 @@ func TestDeleteCompare(t *testing.T) {
 	seenVals4 := map[int]bool{}
 	seenVals6 := map[int]bool{}
 
-	for range numProbes {
+	for j := 0; j < numProbes; j++ {
 		a := randomAddr()
 
 		goldVal, goldOK := gold.lookup(a)
@@ -1640,7 +1640,7 @@ func TestDeleteShuffled(t *testing.T) {
 		deleteCut    = numPerFamily / 2
 	)
 
-	for range 10 {
+	for j := 0; j < 10; j++ {
 		// We have to do this little dance instead of just using allPrefixes,
 		// because we want pfxs and toDelete to be non-overlapping sets.
 		all4, all6 := randomPrefixes4(numPerFamily), randomPrefixes6(numPerFamily)
@@ -1730,7 +1730,7 @@ func TestDeleteButOne(t *testing.T) {
 	// Insert N prefixes, then delete all but one
 	const N = 100
 
-	for range 1_000 {
+	for j := 0; j < 1_000; j++ {
 
 		tbl := new(Table[int])
 		prefixes := randomPrefixes(N)
@@ -2201,7 +2201,7 @@ func TestUnionCompare(t *testing.T) {
 
 	const numEntries = 200
 
-	for range 100 {
+	for j := 0; j < 100; j++ {
 		pfxs := randomPrefixes(numEntries)
 		fast := new(Table[int])
 		gold := new(goldTable[int]).insertMany(pfxs)
@@ -2568,13 +2568,15 @@ func TestSize(t *testing.T) {
 	var allInc4 int
 	var allInc6 int
 
-	for range tbl.AllSorted4() {
+	tbl.AllSorted4()(func(prefix netip.Prefix, a any) bool {
 		allInc4++
-	}
+		return true
+	})
 
-	for range tbl.AllSorted6() {
+	tbl.AllSorted6()(func(prefix netip.Prefix, a any) bool {
 		allInc6++
-	}
+		return true
+	})
 
 	if allInc4 != tbl.Size4() {
 		t.Errorf("Size4: want: %d, got: %d", allInc4, tbl.Size4())
@@ -2673,7 +2675,7 @@ func BenchmarkTableInsertRandom(b *testing.B) {
 
 		b.ResetTimer()
 		b.Run(fmt.Sprintf("mutable into %d", n), func(b *testing.B) {
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				rt.Insert(probe, &myInt)
 			}
 
@@ -2692,7 +2694,7 @@ func BenchmarkTableInsertRandom(b *testing.B) {
 
 		b.ResetTimer()
 		b.Run(fmt.Sprintf("persist into %d", n), func(b *testing.B) {
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				_ = prt.InsertPersist(probe, &myInt)
 			}
 
@@ -2725,14 +2727,14 @@ func BenchmarkTableDelete(b *testing.B) {
 
 		b.ResetTimer()
 		b.Run(fmt.Sprintf("mutable from_%d", n), func(b *testing.B) {
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				rt.Delete(probe)
 			}
 		})
 
 		b.ResetTimer()
 		b.Run(fmt.Sprintf("persist from_%d", n), func(b *testing.B) {
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				_ = prt.DeletePersist(probe)
 			}
 		})
@@ -2756,7 +2758,7 @@ func BenchmarkTableGet(b *testing.B) {
 
 			b.ResetTimer()
 			b.Run(fmt.Sprintf("%s/From_%d", fam, nroutes), func(b *testing.B) {
-				for range b.N {
+				for j := 0; j < b.N; j++ {
 					_, boolSink = rt.Get(probe.pfx)
 				}
 			})
@@ -2781,28 +2783,28 @@ func BenchmarkTableLPM(b *testing.B) {
 
 			b.ResetTimer()
 			b.Run(fmt.Sprintf("%s/In_%6d/%s", fam, nroutes, "Contains"), func(b *testing.B) {
-				for range b.N {
+				for j := 0; j < b.N; j++ {
 					boolSink = rt.Contains(probe.pfx.Addr())
 				}
 			})
 
 			b.ResetTimer()
 			b.Run(fmt.Sprintf("%s/In_%6d/%s", fam, nroutes, "Lookup"), func(b *testing.B) {
-				for range b.N {
+				for j := 0; j < b.N; j++ {
 					_, boolSink = rt.Lookup(probe.pfx.Addr())
 				}
 			})
 
 			b.ResetTimer()
 			b.Run(fmt.Sprintf("%s/In_%6d/%s", fam, nroutes, "Prefix"), func(b *testing.B) {
-				for range b.N {
+				for j := 0; j < b.N; j++ {
 					_, boolSink = rt.LookupPrefix(probe.pfx)
 				}
 			})
 
 			b.ResetTimer()
 			b.Run(fmt.Sprintf("%s/In_%6d/%s", fam, nroutes, "PrefixLPM"), func(b *testing.B) {
-				for range b.N {
+				for j := 0; j < b.N; j++ {
 					_, _, boolSink = rt.LookupPrefixLPM(probe.pfx)
 				}
 			})
@@ -2827,7 +2829,7 @@ func BenchmarkTableOverlapsPrefix(b *testing.B) {
 
 			b.ResetTimer()
 			b.Run(fmt.Sprintf("%s/With_%d", fam, nroutes), func(b *testing.B) {
-				for range b.N {
+				for j := 0; j < b.N; j++ {
 					boolSink = rt.OverlapsPrefix(probe.pfx)
 				}
 			})
@@ -2855,7 +2857,7 @@ func BenchmarkTableOverlaps(b *testing.B) {
 
 			b.ResetTimer()
 			b.Run(fmt.Sprintf("%s/%d_with_%d", fam, nroutes, nroutes), func(b *testing.B) {
-				for range b.N {
+				for j := 0; j < b.N; j++ {
 					boolSink = rt.Overlaps(inter)
 				}
 			})
@@ -2878,7 +2880,7 @@ func BenchmarkTableClone(b *testing.B) {
 
 			b.ResetTimer()
 			b.Run(fmt.Sprintf("%s/%d", fam, nroutes), func(b *testing.B) {
-				for range b.N {
+				for j := 0; j < b.N; j++ {
 					rt.Clone()
 				}
 			})
@@ -2895,7 +2897,7 @@ func BenchmarkMemIP4(b *testing.B) {
 
 		b.Run(strconv.Itoa(k), func(b *testing.B) {
 			rt := new(Table[struct{}])
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				rt = new(Table[struct{}])
 				for _, pfx := range randomRealWorldPrefixes4(k) {
 					rt.Insert(pfx, struct{}{})
@@ -2925,7 +2927,7 @@ func BenchmarkMemIP6(b *testing.B) {
 
 		b.Run(strconv.Itoa(k), func(b *testing.B) {
 			rt := new(Table[struct{}])
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				rt = new(Table[struct{}])
 				for _, pfx := range randomRealWorldPrefixes6(k) {
 					rt.Insert(pfx, struct{}{})
@@ -2955,7 +2957,7 @@ func BenchmarkMem(b *testing.B) {
 
 		b.Run(strconv.Itoa(k), func(b *testing.B) {
 			rt := new(Table[struct{}])
-			for range b.N {
+			for j := 0; j < b.N; j++ {
 				rt = new(Table[struct{}])
 				for _, pfx := range randomRealWorldPrefixes(k) {
 					rt.Insert(pfx, struct{}{})
@@ -3046,9 +3048,10 @@ func checkNumNodes(t *testing.T, tbl *Table[int], want int) {
 func (t *Table[V]) dumpAsGoldTable() goldTable[V] {
 	var tbl goldTable[V]
 
-	for p, v := range t.AllSorted() {
+	t.AllSorted()(func(p netip.Prefix, v V) bool {
 		tbl = append(tbl, goldTableItem[V]{pfx: p, val: v})
-	}
+		return true
+	})
 
 	return tbl
 }
