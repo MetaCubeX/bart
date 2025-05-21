@@ -3,7 +3,7 @@
 
 package allot
 
-import "github.com/gaissmai/bart/internal/bitset"
+import "github.com/metacubex/bart/internal/bitset"
 
 // IdxToFringeRoutes as precalculated bitsets,
 //

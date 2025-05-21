@@ -7,9 +7,9 @@ import (
 	"net/netip"
 	"sort"
 
-	"github.com/gaissmai/bart/internal/art"
-	"github.com/gaissmai/bart/internal/lpm"
-	"github.com/gaissmai/bart/internal/sparse"
+	"github.com/metacubex/bart/internal/art"
+	"github.com/metacubex/bart/internal/lpm"
+	"github.com/metacubex/bart/internal/sparse"
 )
 
 const (

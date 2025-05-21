@@ -8,7 +8,7 @@
 // to understand the baseIndex algorithm.
 package allot
 
-import "github.com/gaissmai/bart/internal/bitset"
+import "github.com/metacubex/bart/internal/bitset"
 
 // IdxToPrefixRoutes as precalculated bitsets,
 //

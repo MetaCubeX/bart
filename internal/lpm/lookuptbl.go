@@ -6,7 +6,7 @@
 // can be replaced by a fast bitset operation.
 package lpm
 
-import "github.com/gaissmai/bart/internal/bitset"
+import "github.com/metacubex/bart/internal/bitset"
 
 // BackTrackingBitset is the backtracking sequence in the complete binary tree
 // of the prefixes (mapped by the base_index function) as bitstring.
