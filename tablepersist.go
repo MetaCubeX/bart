@@ -6,7 +6,7 @@ package bart
 import (
 	"net/netip"
 
-	"github.com/gaissmai/bart/internal/art"
+	"github.com/metacubex/bart/internal/art"
 )
 
 // InsertPersist is similar to Insert but the receiver isn't modified.

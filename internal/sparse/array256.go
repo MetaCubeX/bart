@@ -20,7 +20,7 @@
 package sparse
 
 import (
-	"github.com/gaissmai/bart/internal/bitset"
+	"github.com/metacubex/bart/internal/bitset"
 )
 
 // Array256 is a popcount-compressed sparse array for up to 256 item slots.

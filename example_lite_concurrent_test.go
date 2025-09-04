@@ -4,7 +4,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/gaissmai/bart"
+	"github.com/metacubex/bart"
 )
 
 var (

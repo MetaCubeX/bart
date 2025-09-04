@@ -6,7 +6,7 @@ package bart
 import (
 	"math/rand"
 
-	"github.com/gaissmai/bart/internal/art"
+	"github.com/metacubex/bart/internal/art"
 )
 
 // goldStrideTbl, is an 8-bit slow routing table, implemented as a slice

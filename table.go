@@ -27,8 +27,8 @@ import (
 	"net/netip"
 	"sync"
 
-	"github.com/gaissmai/bart/internal/art"
-	"github.com/gaissmai/bart/internal/lpm"
+	"github.com/metacubex/bart/internal/art"
+	"github.com/metacubex/bart/internal/lpm"
 )
 
 // Table represents a thread-safe IPv4 and IPv6 routing table with payload V.

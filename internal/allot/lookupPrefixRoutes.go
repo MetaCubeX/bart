@@ -16,7 +16,7 @@
 // see the ART paper at: ./doc/artlookup.pdf
 package allot
 
-import "github.com/gaissmai/bart/internal/bitset"
+import "github.com/metacubex/bart/internal/bitset"
 
 // IdxToPrefixRoutes returns the precalculated BitSet for a given base index.
 //

@@ -3,7 +3,7 @@
 
 package allot
 
-import "github.com/gaissmai/bart/internal/bitset"
+import "github.com/metacubex/bart/internal/bitset"
 
 // IdxToFringeRoutes returns the precomputed BitSet for a base index,
 // representing all more specific baseIndices (i.e., subprefixes) covered
