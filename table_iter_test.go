@@ -1,3 +1,5 @@
+//go:build go1.23
+
 // Copyright (c) 2024 Karl Gaissmaier
 // SPDX-License-Identifier: MIT
 
@@ -5,15 +7,16 @@ package bart
 
 import (
 	"fmt"
-	"math/rand/v2"
+	"math/rand"
 	"net/netip"
 	"slices"
+	"sort"
 	"testing"
 )
 
 func TestAll4RangeOverFunc(t *testing.T) {
 	t.Parallel()
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomPrefixes4(prng, 10_000)
 	seen := make(map[netip.Prefix]int, 10_000)
 
@@ -65,7 +68,7 @@ func TestAll4RangeOverFunc(t *testing.T) {
 
 func TestAll6RangeOverFunc(t *testing.T) {
 	t.Parallel()
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomPrefixes6(prng, 10_000)
 	seen := make(map[netip.Prefix]int, 10_000)
 
@@ -117,7 +120,7 @@ func TestAll6RangeOverFunc(t *testing.T) {
 
 func TestAllRangeOverFunc(t *testing.T) {
 	t.Parallel()
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomPrefixes(prng, 10_000)
 	seen := make(map[netip.Prefix]int, 10_000)
 
@@ -169,7 +172,7 @@ func TestAllRangeOverFunc(t *testing.T) {
 
 func TestAll4SortedIter(t *testing.T) {
 	t.Parallel()
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomPrefixes4(prng, 10_000)
 	seen := make(map[netip.Prefix]int, 10_000)
 
@@ -221,7 +224,7 @@ func TestAll4SortedIter(t *testing.T) {
 
 func TestAll6SortedRangeOverFunc(t *testing.T) {
 	t.Parallel()
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomPrefixes6(prng, 10_000)
 	seen := make(map[netip.Prefix]int, 10_000)
 
@@ -273,7 +276,7 @@ func TestAll6SortedRangeOverFunc(t *testing.T) {
 
 func TestAllSortedRangeOverFunc(t *testing.T) {
 	t.Parallel()
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomPrefixes(prng, 10_000)
 	seen := make(map[netip.Prefix]int, 10_000)
 
@@ -371,7 +374,7 @@ func TestSupernetsEdgeCase(t *testing.T) {
 
 func TestSupernetsCompare(t *testing.T) {
 	t.Parallel()
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 
 	pfxs := randomRealWorldPrefixes(prng, 1_000)
 
@@ -384,6 +387,7 @@ func TestSupernetsCompare(t *testing.T) {
 	}
 
 	for _, pfx := range randomRealWorldPrefixes(prng, 100_000) {
+		pfx := pfx
 		t.Run("subtest", func(t *testing.T) {
 			t.Parallel()
 			gotGold := gold.supernets(pfx)
@@ -443,7 +447,7 @@ func TestSubnets(t *testing.T) {
 	})
 
 	t.Run("default gateway", func(t *testing.T) {
-		prng := rand.New(rand.NewPCG(42, 42))
+		prng := rand.New(rand.NewSource(42))
 		want4 := 95_555
 		want6 := 105_555
 
@@ -480,7 +484,7 @@ func TestSubnets(t *testing.T) {
 
 func TestSubnetsCompare(t *testing.T) {
 	t.Parallel()
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 
 	pfxs := randomRealWorldPrefixes(prng, 1_000)
 
@@ -493,6 +497,7 @@ func TestSubnetsCompare(t *testing.T) {
 	}
 
 	for _, pfx := range randomRealWorldPrefixes(prng, 100_000) {
+		pfx := pfx
 		t.Run("subtest", func(t *testing.T) {
 			t.Parallel()
 
@@ -519,14 +524,14 @@ func (t *goldTable[V]) lookupPrefixReverse(pfx netip.Prefix) []netip.Prefix {
 	}
 
 	// b,a reverse sort order!
-	slices.SortFunc(result, func(a, b netip.Prefix) int {
-		return cmpPrefix(b, a)
+	sort.Slice(result, func(i, j int) bool {
+		return lessPrefix(result[j], result[i])
 	})
 	return result
 }
 
 func BenchmarkSubnets(b *testing.B) {
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	n := 1_000_000
 
 	rtbl := new(Table[int])
@@ -537,7 +542,7 @@ func BenchmarkSubnets(b *testing.B) {
 	probe := mpp("42.150.112.0/20")
 	b.Run(fmt.Sprintf("Subnets(%q) from %d random pfxs", probe, n), func(b *testing.B) {
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			for range rtbl.Subnets(probe) {
 				continue
 			}
@@ -546,7 +551,7 @@ func BenchmarkSubnets(b *testing.B) {
 }
 
 func BenchmarkSupernets(b *testing.B) {
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	n := 1_000_000
 
 	rtbl := new(Table[int])
@@ -557,7 +562,7 @@ func BenchmarkSupernets(b *testing.B) {
 	probe := mpp("42.150.112.0/20")
 	b.Run(fmt.Sprintf("Supernets(%q) from %d random pfxs", probe, n), func(b *testing.B) {
 		b.ResetTimer()
-		for range b.N {
+		for j := 0; j < b.N; j++ {
 			for range rtbl.Supernets(probe) {
 				continue
 			}

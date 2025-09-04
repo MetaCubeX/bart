@@ -4,11 +4,10 @@
 package bart
 
 import (
-	"cmp"
 	"fmt"
-	"math/rand/v2"
+	"math/rand"
 	"net/netip"
-	"slices"
+	"sort"
 )
 
 // goldTable is a simple and slow route table, implemented as a slice of prefixes
@@ -132,7 +131,9 @@ func (t *goldTable[V]) subnets(pfx netip.Prefix) []netip.Prefix {
 			result = append(result, item.pfx)
 		}
 	}
-	slices.SortFunc(result, cmpPrefix)
+	sort.Slice(result, func(i, j int) bool {
+		return lessPrefix(result[i], result[j])
+	})
 	return result
 }
 
@@ -144,8 +145,13 @@ func (t *goldTable[V]) supernets(pfx netip.Prefix) []netip.Prefix {
 			result = append(result, item.pfx)
 		}
 	}
-	slices.SortFunc(result, cmpPrefix)
-	slices.Reverse(result)
+	sort.Slice(result, func(i, j int) bool {
+		return lessPrefix(result[i], result[j])
+	})
+	//slices.Reverse(result)
+	for i, j := 0, len(result)-1; i < j; i, j = i+1, j-1 {
+		result[i], result[j] = result[j], result[i]
+	}
 	return result
 }
 
@@ -171,11 +177,8 @@ func (ta *goldTable[V]) overlaps(tb *goldTable[V]) bool {
 
 // sort, inplace by netip.Prefix, all prefixes are in normalized form
 func (t *goldTable[V]) sort() {
-	slices.SortFunc(*t, func(a, b goldTableItem[V]) int {
-		if cmp := a.pfx.Addr().Compare(b.pfx.Addr()); cmp != 0 {
-			return cmp
-		}
-		return cmp.Compare(a.pfx.Bits(), b.pfx.Bits())
+	sort.Slice(*t, func(i, j int) bool {
+		return lessPrefix((*t)[i].pfx, (*t)[j].pfx)
 	})
 }
 
@@ -193,7 +196,7 @@ func randomPrefixes4(prng *rand.Rand, n int) []goldTableItem[int] {
 	pfxs := map[netip.Prefix]bool{}
 
 	for len(pfxs) < n {
-		bits := prng.IntN(32)
+		bits := prng.Intn(32)
 		bits++
 		pfx, err := randomIP4(prng).Prefix(bits)
 		if err != nil {
@@ -216,7 +219,7 @@ func randomPrefixes6(prng *rand.Rand, n int) []goldTableItem[int] {
 	pfxs := map[netip.Prefix]bool{}
 
 	for len(pfxs) < n {
-		bits := prng.IntN(128)
+		bits := prng.Intn(128)
 		bits++
 		pfx, err := randomIP6(prng).Prefix(bits)
 		if err != nil {
@@ -237,14 +240,14 @@ func randomPrefixes6(prng *rand.Rand, n int) []goldTableItem[int] {
 
 // randomPrefix returns a randomly generated prefix
 func randomPrefix(prng *rand.Rand) netip.Prefix {
-	if prng.IntN(2) == 1 {
+	if prng.Intn(2) == 1 {
 		return randomPrefix4(prng)
 	}
 	return randomPrefix6(prng)
 }
 
 func randomPrefix4(prng *rand.Rand) netip.Prefix {
-	bits := prng.IntN(33)
+	bits := prng.Intn(33)
 	pfx, err := randomIP4(prng).Prefix(bits)
 	if err != nil {
 		panic(err)
@@ -253,7 +256,7 @@ func randomPrefix4(prng *rand.Rand) netip.Prefix {
 }
 
 func randomPrefix6(prng *rand.Rand) netip.Prefix {
-	bits := prng.IntN(129)
+	bits := prng.Intn(129)
 	pfx, err := randomIP6(prng).Prefix(bits)
 	if err != nil {
 		panic(err)
@@ -264,7 +267,7 @@ func randomPrefix6(prng *rand.Rand) netip.Prefix {
 func randomIP4(prng *rand.Rand) netip.Addr {
 	var b [4]byte
 	for i := range b {
-		b[i] = byte(prng.UintN(256))
+		b[i] = byte(prng.Intn(256))
 	}
 	return netip.AddrFrom4(b)
 }
@@ -272,13 +275,13 @@ func randomIP4(prng *rand.Rand) netip.Addr {
 func randomIP6(prng *rand.Rand) netip.Addr {
 	var b [16]byte
 	for i := range b {
-		b[i] = byte(prng.UintN(256))
+		b[i] = byte(prng.Intn(256))
 	}
 	return netip.AddrFrom16(b)
 }
 
 func randomAddr(prng *rand.Rand) netip.Addr {
-	if prng.IntN(2) == 1 {
+	if prng.Intn(2) == 1 {
 		return randomIP4(prng)
 	}
 	return randomIP6(prng)

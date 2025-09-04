@@ -497,7 +497,7 @@ func (t *Table[V]) UnionPersist(o *Table[V]) *Table[V] {
 	}
 
 	if cloneFn == nil {
-		cloneFn = copyVal
+		cloneFn = copyVal[V]
 	}
 
 	dup4 := pt.root4.unionRecPersist(cloneFn, &o.root4, 0)

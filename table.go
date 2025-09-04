@@ -24,7 +24,6 @@
 package bart
 
 import (
-	"iter"
 	"net/netip"
 	"sync"
 
@@ -660,7 +659,7 @@ LOOP:
 //	for supernet, val := range table.Supernets(netip.MustParsePrefix("192.0.2.128/25")) {
 //	    fmt.Println("Matched covering route:", supernet, "->", val)
 //	}
-func (t *Table[V]) Supernets(pfx netip.Prefix) iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) Supernets(pfx netip.Prefix) func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		if !pfx.IsValid() {
 			return
@@ -778,7 +777,7 @@ func (t *Table[V]) Supernets(pfx netip.Prefix) iter.Seq2[netip.Prefix, V] {
 //	for sub, val := range table.Subnets(netip.MustParsePrefix("10.0.0.0/8")) {
 //	    fmt.Println("Covered:", sub, "->", val)
 //	}
-func (t *Table[V]) Subnets(pfx netip.Prefix) iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) Subnets(pfx netip.Prefix) func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		if !pfx.IsValid() {
 			return
@@ -902,7 +901,7 @@ func (t *Table[V]) Union(o *Table[V]) {
 	// returns nil if V does not implement the Cloner interface.
 	cloneFn := cloneFnFactory[V]()
 	if cloneFn == nil {
-		cloneFn = copyVal
+		cloneFn = copyVal[V]
 	}
 
 	dup4 := t.root4.unionRec(cloneFn, &o.root4, 0)
@@ -970,21 +969,21 @@ func (t *Table[V]) Size6() int {
 //
 // Under the hood, the loop body is passed as a yield function to the iterator.
 // If you break or return from the loop, iteration stops early as expected.
-func (t *Table[V]) All() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) All() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root4.allRec(stridePath{}, 0, true, yield) && t.root6.allRec(stridePath{}, 0, false, yield)
 	}
 }
 
 // All4 is like [Table.All] but only for the v4 routing table.
-func (t *Table[V]) All4() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) All4() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root4.allRec(stridePath{}, 0, true, yield)
 	}
 }
 
 // All6 is like [Table.All] but only for the v6 routing table.
-func (t *Table[V]) All6() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) All6() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root6.allRec(stridePath{}, 0, false, yield)
 	}
@@ -1001,7 +1000,7 @@ func (t *Table[V]) All6() iter.Seq2[netip.Prefix, V] {
 //
 // The traversal is stable and predictable across calls.
 // Iteration stops early if you break out of the loop.
-func (t *Table[V]) AllSorted() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) AllSorted() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root4.allRecSorted(stridePath{}, 0, true, yield) &&
 			t.root6.allRecSorted(stridePath{}, 0, false, yield)
@@ -1009,14 +1008,14 @@ func (t *Table[V]) AllSorted() iter.Seq2[netip.Prefix, V] {
 }
 
 // AllSorted4 is like [Table.AllSorted] but only for the v4 routing table.
-func (t *Table[V]) AllSorted4() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) AllSorted4() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root4.allRecSorted(stridePath{}, 0, true, yield)
 	}
 }
 
 // AllSorted6 is like [Table.AllSorted] but only for the v6 routing table.
-func (t *Table[V]) AllSorted6() iter.Seq2[netip.Prefix, V] {
+func (t *Table[V]) AllSorted6() func(yield func(netip.Prefix, V) bool) {
 	return func(yield func(netip.Prefix, V) bool) {
 		_ = t.root6.allRecSorted(stridePath{}, 0, false, yield)
 	}

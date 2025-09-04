@@ -1,7 +1,7 @@
 package bart
 
 import (
-	"math/rand/v2"
+	"math/rand"
 	"testing"
 )
 
@@ -29,7 +29,7 @@ func TestInsertPersistTable(t *testing.T) {
 	// setup
 	const n = 10_000
 
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomRealWorldPrefixes(prng, n)
 
 	orig := new(Table[*testVal])
@@ -69,7 +69,7 @@ func TestUpdatePersistTable(t *testing.T) {
 	// setup
 	const n = 10_000
 
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomRealWorldPrefixes(prng, n)
 
 	orig := new(Table[*testVal])
@@ -113,7 +113,7 @@ func TestDeletePersistTable(t *testing.T) {
 	// setup
 	const n = 10_000
 
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomRealWorldPrefixes(prng, n)
 
 	orig := new(Table[*testVal])
@@ -145,7 +145,7 @@ func TestInsertPersistLite(t *testing.T) {
 
 	// setup
 	const n = 10_000
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomRealWorldPrefixes(prng, n)
 
 	orig := new(Lite)
@@ -188,7 +188,7 @@ func TestDeletePersistLite(t *testing.T) {
 	const n = 10_000
 
 	// setup
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomRealWorldPrefixes(prng, n)
 
 	orig := new(Lite)

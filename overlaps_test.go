@@ -10,7 +10,7 @@
 package bart
 
 import (
-	"math/rand/v2"
+	"math/rand"
 	"net/netip"
 	"testing"
 )
@@ -63,14 +63,14 @@ func TestRegressionOverlaps(t *testing.T) {
 
 func TestOverlapsCompare(t *testing.T) {
 	t.Parallel()
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 
 	// Empirically, between 5 and 6 routes per table results in ~50%
 	// of random pairs overlapping. Cool example of the birthday paradox!
 	const numEntries = 6
 
 	seen := map[bool]int{}
-	for range 10_000 {
+	for j := 0; j < 10_000; j++ {
 		pfxs := randomPrefixes(prng, numEntries)
 		fast := new(Table[int])
 		gold := new(goldTable[int]).insertMany(pfxs)
@@ -100,7 +100,7 @@ func TestOverlapsCompare(t *testing.T) {
 
 func TestOverlapsPrefixCompare(t *testing.T) {
 	t.Parallel()
-	prng := rand.New(rand.NewPCG(42, 42))
+	prng := rand.New(rand.NewSource(42))
 	pfxs := randomPrefixes(prng, 100_000)
 
 	fast := new(Table[int])
